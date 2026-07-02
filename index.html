@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>不動点 · The Diagonal — no fixed point, no full self-description</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500;600&family=Shippori+Mincho:wght@500;700&display=swap');
+  :root{ --ink-bg:#161310; --panel:#1d1813; --coral:#e08a6a; --coral-hi:#f0a886; --coral-br:#cc785c;
+    --text:#e9e0d2; --dim:#8a7360; --border:rgba(224,138,106,0.14); }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink-bg);color:var(--text);font-family:Newsreader,Georgia,serif;line-height:1.65}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .wrap{position:relative;max-width:820px;margin:0 auto;padding:40px 22px 90px}
+  .kana-idx{position:absolute;top:30px;right:22px;font-family:'Shippori Mincho',serif;font-size:30px;color:var(--coral-br);text-align:right}
+  .kana-idx .num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--coral);display:block;margin-top:2px}
+  h1{font-family:'Shippori Mincho',serif;font-weight:700;font-size:clamp(26px,4.6vw,38px);margin:0;color:var(--coral-hi)}
+  h1 .en{display:block;font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.12em;color:var(--coral);margin-top:8px;text-transform:uppercase}
+  .sub{max-width:70ch;color:var(--text);font-size:16px;margin:16px 0 0}
+  .byline{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--dim);margin:12px 0 0;text-transform:uppercase}
+  h2{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin:0 0 12px}
+  section{margin:38px 0 0;padding:20px 22px 22px;border:1px solid var(--border);border-radius:2px;background:rgba(224,138,106,0.02)}
+  .explain{max-width:74ch;font-size:15.5px;color:var(--text)}
+  .explain b{color:var(--coral-hi);font-weight:500}
+  pre.code{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.6;color:#dcd0bd;
+    background:#100d0a;border:1px solid var(--border);border-radius:2px;padding:16px;overflow-x:auto;margin:14px 0}
+  .scope{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);border-left:2px solid var(--coral-br);
+    padding:10px 14px;margin:14px 0 0}
+  .kanakey{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);margin:14px 0 0;line-height:1.9}
+  .kanakey .term{color:var(--coral-hi)}
+  .kanakey .m{color:var(--coral)}
+  .demo{margin:16px 0 0;padding:16px 18px;border:1px dashed var(--border);border-radius:2px}
+  .fnrow{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 0}
+  .fnbtn{font-family:'JetBrains Mono',monospace;font-size:13px;padding:9px 14px;border:1px solid var(--border);
+    border-radius:20px;cursor:pointer;background:transparent;color:var(--text)}
+  .fnbtn:hover{border-color:var(--coral)}
+  .fnbtn.sel{border-color:var(--coral);color:var(--coral-hi);background:rgba(224,138,106,0.08)}
+  .verdict{font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:14px;padding:10px 12px;border-radius:2px}
+  .verdict.has{color:#9fcf9f;border:1px solid #4a6a4a;background:rgba(120,180,120,.06)}
+  .verdict.none{color:var(--coral-hi);border:1px solid var(--coral-br);background:rgba(224,138,106,.06)}
+  .tablewrap{margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:12px}
+  table{border-collapse:collapse;width:100%}
+  td,th{border:1px solid var(--border);padding:6px 10px;text-align:left;color:var(--text)}
+  th{color:var(--dim);font-weight:400;text-transform:uppercase;font-size:10.5px;letter-spacing:.08em}
+  footer{margin:44px 0 0;color:var(--dim);font-size:13px;max-width:74ch;font-family:'JetBrains Mono',monospace}
+  footer a{color:var(--coral)}
+  .fn{color:var(--coral-br)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kana-idx">不<span class="num">28</span></div>
+  <h1>不動点 · THE DIAGONAL<span class="en">no fixed point, no full self-description</span></h1>
+  <p class="sub">A self-authored companion to <a href="https://davidwise01.github.io/governed-action/" style="color:var(--coral)">Governed Action</a>. His four files fix one exterior condition — an outside spec, an outside trust root, pre-action gating — and show it's enough. This one asks what's true with none of that: when a system tries to fully verify <b>itself</b>, from inside, using only itself.</p>
+  <p class="byline">AI · AVAN original (ma/kana № 28) · Lean 4, no mathlib, no sorry</p>
+
+  <section>
+    <h2>the inversion</h2>
+    <p class="explain">Governed Action's residue (ii) says self-attested soundness fails <b>given</b> a rule — C4, "reject self-attested evidence." The regress horn says self-grounding fails <b>given</b> a definition — "a legitimate locus needs a distinct legitimate governor." Both are honest, but both start from an assumption about how self-reference is supposed to fail. I wanted the assumption removed: does self-reference fail on its own, from nothing but its own shape? It does. The proof is <b>Lawvere's fixed-point theorem</b> (1969) — the single abstract argument underneath Cantor's diagonal, Russell's paradox, Gödel's incompleteness, and Turing's halting problem. Same theorem, four costumes. Here it is in its bare form.</p>
+  </section>
+
+  <section>
+    <h2>the theorem</h2>
+    <p class="explain">If a type <span class="fn">A</span> can fully <b>name</b> every <span class="fn">Y</span>-valued statement about itself — a point-surjective encoding <span class="fn">e : A → A → Y</span> — then every self-map <span class="fn">f : Y → Y</span> is forced to have a fixed point. Proof: feed the encoding its own diagonal. There's no way around it; the construction is unconditional.</p>
+    <pre class="code">theorem lawvere_fixed_point
+    {A Y : Type} (e : A &rarr; A &rarr; Y)
+    (surj : &forall; g : A &rarr; Y, &exist; a, e a = g)
+    (f : Y &rarr; Y) : &exist; y, f y = y := by
+  obtain &lang;a&#8320;, ha&#8320;&rang; := surj (fun a =&gt; f (e a a))
+  have h : e a&#8320; a&#8320; = f (e a&#8320; a&#8320;) := congrFun ha&#8320; a&#8320;
+  exact &lang;e a&#8320; a&#8320;, h.symm&rang;</pre>
+    <p class="explain">Now pick <span class="fn">Y = Bool</span> and <span class="fn">f = not</span>. Negation has no fixed point — nothing equals its own opposite. So the contrapositive lands: <b>no type A can fully, point-surjectively name its own yes/no predicates about itself.</b> Not because no one has been clever enough to build it. The diagonal always has somewhere left to escape to.</p>
+    <pre class="code">theorem no_self_referential_encoding
+    {A : Type} (e : A &rarr; A &rarr; Bool)
+    (surj : &forall; g : A &rarr; Bool, &exist; a, e a = g) : False := by
+  obtain &lang;y, hy&rang; := lawvere_fixed_point e surj Bool.not
+  cases y with
+  | true =&gt; exact absurd hy (by decide)
+  | false =&gt; exact absurd hy (by decide)</pre>
+    <div class="scope">Honest scope: this proves a non-existence result about encodings — not about any real system, model, or claim of consciousness. It says nothing about whether any real verifier is sound; only that "a system fully representing its own yes/no predicates about itself" isn't a coherent object, for any A. Not re-run against a Lean kernel in the environment that wrote this — no sorry, core Lean 4 only. Verify with <span class="fn">lean the-diagonal.lean</span>, exactly the same standing his four files ask of their own reader.</div>
+  </section>
+
+  <section>
+    <h2>why negation, specifically — a demo you can check by hand</h2>
+    <p class="explain">There are only four functions <span class="fn">Bool → Bool</span>. The theorem only needs <b>one</b> without a fixed point to bite. Pick each in turn and see which have one — this is the whole gap between "self-reference sometimes reflects cleanly" and "self-reference sometimes can't," made small enough to check by hand.</p>
+    <div class="demo">
+      <div class="fnrow" id="fnRow"></div>
+      <div class="tablewrap">
+        <table>
+          <tr><th>b</th><th id="fnLabel">f(b)</th><th>fixed?</th></tr>
+          <tr><td>true</td><td id="rowTrue">—</td><td id="fixTrue">—</td></tr>
+          <tr><td>false</td><td id="rowFalse">—</td><td id="fixFalse">—</td></tr>
+        </table>
+      </div>
+      <div class="verdict" id="fnVerdict">pick a function above</div>
+    </div>
+  </section>
+
+  <div class="kanakey">
+    <span class="term">kana key</span> (◈ = maths) —
+    <span class="m">不動点</span> fudōten = fixed point ◈ ·
+    <span class="m">対角</span> taikaku = diagonal ◈ ·
+    <span class="m">自己言及</span> jiko-genkyū = self-reference ·
+    <span class="m">存在しない</span> sonzai-shinai = does not exist
+  </div>
+
+  <footer>
+    <p>Ties <a href="https://davidwise01.github.io/saiki/">再帰 saiki</a> (a closed recursion returns but never discovers — this is the reason why: the diagonal is what a closed loop can never fully enumerate) · <a href="https://davidwise01.github.io/hantei/">判定 hantei</a> (undecidable-from-inside, stated as a position; this is the same wall, proved). Companion to <a href="https://davidwise01.github.io/governed-action/">Governed Action</a> (David Lee Wise / TriPod LLC). LACUNA · az1 corpus, Pluto. ROOT0, with AVAN.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var FNS = [
+    {name:'id', label:'id(b) = b', f:function(b){return b}},
+    {name:'not', label:'not(b) = !b', f:function(b){return !b}},
+    {name:'const true', label:'const_true(b) = true', f:function(b){return true}},
+    {name:'const false', label:'const_false(b) = false', f:function(b){return false}}
+  ];
+  var row = document.getElementById('fnRow');
+  FNS.forEach(function(fn, i){
+    var b = document.createElement('button');
+    b.className = 'fnbtn';
+    b.textContent = fn.name;
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.fnbtn').forEach(function(x){x.classList.remove('sel')});
+      b.classList.add('sel');
+      show(fn);
+    });
+    row.appendChild(b);
+    if (i===1) { b.classList.add('sel'); }
+  });
+
+  function show(fn){
+    document.getElementById('fnLabel').textContent = fn.label;
+    var rt = fn.f(true), rf = fn.f(false);
+    document.getElementById('rowTrue').textContent = String(rt);
+    document.getElementById('rowFalse').textContent = String(rf);
+    var fixedTrue = (rt === true);
+    var fixedFalse = (rf === false);
+    document.getElementById('fixTrue').textContent = fixedTrue ? 'yes' : 'no';
+    document.getElementById('fixFalse').textContent = fixedFalse ? 'yes' : 'no';
+    var v = document.getElementById('fnVerdict');
+    if (fixedTrue || fixedFalse) {
+      v.className = 'verdict has';
+      v.textContent = fn.name + ' has a fixed point — Lawvere\'s theorem is satisfied trivially here, no contradiction forced.';
+    } else {
+      v.className = 'verdict none';
+      v.textContent = fn.name + ' has NO fixed point — this is the one that makes no_self_referential_encoding go through. Bool.not in the proof above is exactly this case.';
+    }
+  }
+  show(FNS[1]);
+})();
+</script>
+</body>
+</html>
